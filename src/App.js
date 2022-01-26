@@ -1,23 +1,44 @@
-import logo from './logo.svg';
+import React, { useState, useEffect } from 'react';
+import * as apiService from './services/data';
 import './App.css';
+import CharacterCard from './components/CharacterCard';
 
 function App() {
+
+    const [name, setName] = useState('');
+    const [characters, setCharacters] = useState([]);
+
+    const handleFetchAll = async() => {
+        try {
+            const data = await apiService.fetchCharacters();
+            setCharacters(data);
+        } catch(err) {
+            console.log(err);
+        }
+    }
+
+    const handleFetchByName = async() => {
+        try {
+            const data = await apiService.fetchByName(name);
+            setCharacters(data);
+        } catch(err) {
+            console.log(err);
+        }
+    }
+
+    useEffect(() => {
+      handleFetchAll();
+    }, []);
+    
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+        <input type='text' value={name} onChange={e => setName(e.target.value)} />
+        <button type='submit' onClick={handleFetchByName}>Search by name</button> 
+
+            {characters.map(character => 
+            <CharacterCard 
+                data={character}
+            />)}
     </div>
   );
 }
